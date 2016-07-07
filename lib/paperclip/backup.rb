@@ -2,6 +2,7 @@ require 'paperclip/backup/version'
 require 'paperclip/helpers/configuration'
 require 'paperclip/backup/backup_attached_file'
 require 'paperclip/backup/compressor'
+require 'fog'
 
 
 module Paperclip
@@ -9,9 +10,14 @@ module Paperclip
     extend Configuration
     extend ActiveSupport::Concern
 
-    # define_setting :backup_models, []
-    define_setting :run_at, []           # Whenever schedule
+    # Whenever schedule
+    define_setting :run_at
 
+    # AWS credentials and Glacier configuration
+    define_setting :aws_access_key_id
+    define_setting :aws_secret_access_key
+    define_setting :glacier_region
+    define_setting :glacier_vault
 
     module ClassMethods
       def backup_attached_file(name, options = {})

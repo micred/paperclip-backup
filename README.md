@@ -37,9 +37,28 @@ class AddPaperclipBackupColumns < ActiveRecord::Migration
   def change
     add_column :photos, :image_last_backup_at, :datetime
     add_column :photos, :image_backup_archives, :string, array: true, default: []
+
+    add_index :photos, :image_last_backup_at
+    add_index :photos, :image_updated_at
   end
 end
 ```
+
+### Set AWS credentials
+
+Add to ```config/initializers/paperclip-backup.rb```
+```ruby
+Paperclip::Backup.configuration do |config|
+  # AWS Glacier configuration
+  config.aws_access_key_id = ENV['aws_access_key_id']
+  config.aws_secret_access_key = ENV['aws_secret_access_key']
+  config.glacier_region = ENV['glacier_region']
+  config.glacier_vault = ENV['glacier_vault']
+end
+```
+
+Set the correct AWS credentials and Glacier vault (via ENV variables, with Figaro, or in plain text).
+
 
 ### Launch backup of all models
 ```ruby
