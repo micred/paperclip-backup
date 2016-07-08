@@ -42,14 +42,14 @@ module Paperclip
 
           Compressor.compress backup_file, backup_dir
 
-          Compressor.upload_to_glacier backup_file
+          job = Compressor.upload_to_glacier backup_file
 
-          # Backup done correctly, update Glacier references.
+          # Backup done correctly, update Glacier references with "backup name" and "Glacier archive id".
           # Notice: update is not done via update_all() since it suffer concurrency problems (it updates all rows
           #         that matches the SQL query, that are not necessarily the same of local variable resources).
           resources.each do |resource|
             resource.update "#{name}_last_backup_at" => backup_at,
-                            "#{name}_backup_archives" => resource["#{name}_backup_archives"] + [backup_name]
+                            "#{name}_backup_archives" => resource["#{name}_backup_archives"] + ["#{backup_name}-#{job.id}"]
             # Workaround since << operator doesn't work with PG arrays in Rails 4.1
           end
 

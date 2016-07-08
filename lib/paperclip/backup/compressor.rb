@@ -40,14 +40,18 @@ module Paperclip
 
       def self.upload_to_glacier zipfile_name
         glacier = Fog::AWS::Glacier.new({
-                                            :aws_access_key_id => Paperclip::Backup.aws_access_key_id,
-                                            :aws_secret_access_key => Paperclip::Backup.aws_secret_access_key,
-                                            :region => Paperclip::Backup.glacier_region
+                                            aws_access_key_id: Paperclip::Backup.aws_access_key_id,
+                                            aws_secret_access_key: Paperclip::Backup.aws_secret_access_key,
+                                            region: Paperclip::Backup.glacier_region
                                         })
-        vault = glacier.vaults.create :id => Paperclip::Backup.glacier_vault
-        job = vault.archives.create :body => File.new(zipfile_name),
-                                    :description => "Archive #{zipfile_name}",
-                                    :multipart_chunk_size => 1024*1024
+        vault = glacier.vaults.create id: Paperclip::Backup.glacier_vault
+        job = vault.archives.create body: File.new(zipfile_name),
+                                    description: "Archive #{zipfile_name}",
+                                    multipart_chunk_size: 1024*1024
+      end
+
+      def self.retrieve
+        # http://www.spacevatican.org/2012/9/4/using-glacier-with-fog/
       end
     end
   end
