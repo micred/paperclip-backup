@@ -10,22 +10,22 @@ module Paperclip
         # Try 3 times to download
         3.times do
           begin
+            s3_md5 = nil
             File.open(filename, 'wb') do |file|
               transfer = resource.send(attachment).s3_object(:original).read do |chunk|
                 file.write(chunk)
               end
-
-              # Check if file is downloaded correctly
               s3_md5 = transfer[:etag].gsub('"', '')
-              downloaded_md5 = Digest::MD5.hexdigest(File.read(filename))
-
-              return filename  if s3_md5 == downloaded_md5
             end
+
+            # Check if file is downloaded correctly
+            downloaded_md5 = Digest::MD5.hexdigest(File.read(filename))
+            return filename  if s3_md5 == downloaded_md5
           rescue
           end
         end
 
-        raise 'Cannot download original attachment'
+        raise "Cannot download attachment #{attachment}(:original) of #{resource.class.name} with id: #{resource.id}."
       end
 
 
